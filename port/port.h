@@ -242,7 +242,9 @@ extern long random();
 #if defined(ultrix3) || defined(ultrix4) ||  defined(__hpux)
 extern unsigned sleep();
 #else
-extern VOID_HACK sleep();
+//TODO: @Jingren Wang: temp fix
+extern unsigned int sleep();
+//extern VOID_HACK sleep();
 #endif
 #endif  /* _std_h */
 /* assertion macro */

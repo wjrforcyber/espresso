@@ -26,6 +26,7 @@
     if ((obj)) { (void) free((char *) (obj)); (obj) = 0; }
 
 #include "ansi.h"
+#include <stdio.h>
 
 EXTERN long  util_cpu_time
 	NULLARGS;

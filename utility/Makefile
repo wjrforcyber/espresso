@@ -72,21 +72,23 @@ AR = ar
 RANLIB = ranlib
 CPLUSPLUS = g++
 
-OCTTOOLS=/projects/octtools/octtools/${MACHINE}
+OCTTOOLS=./
 CADROOT	= $$OCTTOOLS
 UTILS	= ${OCTTOOLS}/utils
 
-LINTCREATEFLAG = -C
-LINTEXTRAS =
+#LINTCREATEFLAG = -C
+#LINTEXTRAS =
 DBGFLAG =
 OPTFLAG =
+
+PORT_E	= ../port
 
 # an alternative if you want links in the installation locations
 # back to the source directories would be:
 #   CP = sh -c 'ln -s `pwd`/$$0 $$1'
 CP = cp
 
-BUILD = ${UTILS}/bin/create-octtools-makefile
+#BUILD = ${UTILS}/bin/create-octtools-makefile
 
 # cute hack for the sequent
 #   setenv PARALLEL 8; make P="&" install
@@ -95,7 +97,7 @@ P =
 NAME	= utility
 
 # packages required for this package/tool
-REQUIRE	= st mm port
+#REQUIRE	= st mm port
 
 # tools required for this tool
 TOOLREQUIRE = 
@@ -113,7 +115,7 @@ DRIVER	= $(NAME)-test
 CADBIN	= ${OCTTOOLS}/bin
 
 PKGINSTALL= ${OCTTOOLS}/lib/${LIB} ${OCTTOOLS}/include/${EXPHDR} ${OCTTOOLS}/doc/${DOC}
-LINTINSTALL = ${OCTTOOLS}/lib/${LINTLIB}
+#LINTINSTALL = ${OCTTOOLS}/lib/${LINTLIB}
 INSTALL	= ${PKGINSTALL} ${TOOLINSTALL} 
 
 DISTDEST= ${OCTTOOLS}/src/${NAME}
@@ -121,12 +123,12 @@ DISTHOST= BOGUS-HOST
 MISC	= Makefile Makefile.template 
 
 LIBS	= $(OCTTOOLS)/lib/libst$(DBGFLAG).a $(OCTTOOLS)/lib/libmm$(DBGFLAG).a $(OCTTOOLS)/lib/liberrtrap$(DBGFLAG).a $(OCTTOOLS)/lib/libuprintf$(DBGFLAG).a $(OCTTOOLS)/lib/libport$(DBGFLAG).a
-LINTLIBS= $(OCTTOOLS)/lib/llib-lst.ln $(OCTTOOLS)/lib/llib-lmm.ln $(OCTTOOLS)/lib/llib-lport.ln
+#LINTLIBS= $(OCTTOOLS)/lib/llib-lst.ln $(OCTTOOLS)/lib/llib-lmm.ln $(OCTTOOLS)/lib/llib-lport.ln
 
 LIB	= lib${NAME}.a
 LIBPG	= lib${NAME}-pg.a
 LIBG	= lib${NAME}-g.a
-LINTLIB	= llib-l${NAME}.ln
+#LINTLIB	= llib-l${NAME}.ln
 DOC	= ${NAME}.doc
 
 PRINTER	= lps40
@@ -157,27 +159,28 @@ MAKEVARS =	\
 		"CPLUSPLUS=${CPLUSPLUS}" \
 		"VPATH=${VPATH}"
 
-INCLUDE	= -I$(CAD)/include
+INCLUDE	= -I$(CAD)/include -I$(PORT_E)
 CFLAGS	= ${OPTFLAG} ${DBGFLAG} ${INCLUDE} '-DCADROOT="${CADROOT}"'
 VERSION	= "-DCUR_DATE=\"`date | awk '{print $$2, $$3, $$6}'`\"" \
 	  "-DCUR_TIME=\"`date | awk '{print $$4}'`\""
-LINTFLAGS= ${INCLUDE} '-DCADROOT="${CADROOT}"' ${LINTEXTRAS}
-LINTLIBFLAGS= ${INCLUDE} '-DCADROOT="${CADROOT}"' ${LINTEXTRAS}
+#LINTFLAGS= ${INCLUDE} '-DCADROOT="${CADROOT}"' ${LINTEXTRAS}
+#LINTLIBFLAGS= ${INCLUDE} '-DCADROOT="${CADROOT}"' ${LINTEXTRAS}
 LDFLAGS	= -lm
 
 #-----------------------------------------------------------------------
 
 
-all: tags lint ${LIB} ${LINTLIB}
+#all: tags lint ${LIB} ${LINTLIB}
+all: tags ${LIB}
 
 build: Makefile.template
 	${BUILD} Makefile.template
 
 install: ${INSTALL}
-install.lint: ${LINTINSTALL}
+#install.lint: ${LINTINSTALL}
 
-uninstall:
-	rm -rf ${INSTALL} ${LINTINSTALL} ${OCTTOOLS}/lib/${LIBG} ${OCTTOOLS}/lib/${LIBPG}
+#uninstall:
+#	rm -rf ${INSTALL} ${LINTINSTALL} ${OCTTOOLS}/lib/${LIBG} ${OCTTOOLS}/lib/${LIBPG}
 
 version.o: version.c
 	${CC} ${CFLAGS} ${VERSION} -c version.c
@@ -200,8 +203,8 @@ ${LIB}:${P} ${OBJ}
 	${AR} r $@ $?
 	${RANLIB} $@
 
-${LINTLIB}: ${LSRC} ${HDR}
-	lint ${LINTLIBFLAGS} ${LINTCREATEFLAG}${NAME} -n ${LSRC}
+#${LINTLIB}: ${LSRC} ${HDR}
+#	lint ${LINTLIBFLAGS} ${LINTCREATEFLAG}${NAME} -n ${LSRC}
 
 ${LIBPG}: ${SRC} ${HDR}
 	rm -f ${OBJ}
@@ -236,9 +239,9 @@ ${OCTTOOLS}/include/${EXPHDR}: ${EXPHDR}
 	rm -f $@
 	${CP} $? $@
 
-${OCTTOOLS}/lib/${LINTLIB}: ${LINTLIB}
-	rm -f $@
-	${CP} $? $@
+#${OCTTOOLS}/lib/${LINTLIB}: ${LINTLIB}
+#	rm -f $@
+#	${CP} $? $@
 
 ${OCTTOOLS}/doc/${DOC}: ${DOC}
 	rm -f $@
@@ -255,12 +258,16 @@ ${OCTTOOLS}/lib/${LIBPG}: ${LIBPG}
 	${RANLIB} $@
 
 
-lint: ${LSRC} ${DRVRSRC} ${HDR} ${LINTLIBS}
-	lint ${LINTFLAGS} ${LSRC} ${DRVRSRC} ${LINTLIBS} ${LDFLAGS} | tee lint
+#lint: ${LSRC} ${DRVRSRC} ${HDR} ${LINTLIBS}
+#	lint ${LINTFLAGS} ${LSRC} ${DRVRSRC} ${LINTLIBS} ${LDFLAGS} | tee lint
+
+#clean::
+#	rm -f ${OBJ} ${DRVROBJ} ${TARGET} ${TARGETG} ${TARGETPG} ${DRIVER} 
+#	rm -f tags TAGS ${LIB} ${LIBG} ${LIBPG} ${LINTLIB} lint 
+#	rm -f make.out mktemp core .p .pg *~ __________ELEL_
 
 clean::
 	rm -f ${OBJ} ${DRVROBJ} ${TARGET} ${TARGETG} ${TARGETPG} ${DRIVER} 
-	rm -f tags TAGS ${LIB} ${LIBG} ${LIBPG} ${LINTLIB} lint 
 	rm -f make.out mktemp core .p .pg *~ __________ELEL_
 
 require:

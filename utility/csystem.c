@@ -12,6 +12,7 @@
 #include "port.h"
 #include <sys/wait.h>
 #include "utility.h"
+#include <unistd.h>
 
 int
 util_csystem(s)
@@ -31,8 +32,8 @@ char *s;
     }
 
     /* Have the parent ignore interrupt and quit signals */
-    istat = signal(SIGINT, SIG_IGN);
-    qstat = signal(SIGQUIT, SIG_IGN);
+    istat = (int *)signal(SIGINT, SIG_IGN);
+    qstat = (int *)signal(SIGQUIT, SIG_IGN);
 
     while ((w = wait(&status)) != pid && w != -1)
 	    ;
@@ -47,7 +48,7 @@ char *s;
     }
 
     /* Restore interrupt and quit signal handlers */
-    (void) signal(SIGINT, istat);
-    (void) signal(SIGQUIT, qstat);
+    (void) signal(SIGINT, (void *)istat);
+    (void) signal(SIGQUIT, (void *)qstat);
     return retval;
 }
