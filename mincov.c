@@ -7,6 +7,7 @@
  * $Date$
  *
  */
+#include "utility.h"
 #include "mincov_int.h"
 
 /*
@@ -16,9 +17,9 @@
 #define USE_GIMPEL
 #define USE_INDEP_SET
 
-extern int select_column();
-extern void select_essential();
-extern int verify_cover();
+static int select_column();
+static void select_essential();
+static int verify_cover();
 
 #define fail(why) {\
     (void) fprintf(stderr, "Fatal error: file %s, line %d\n%s\n",\

@@ -69,21 +69,25 @@ SHELL	= /bin/sh
 
 MAKE = /bin/make
 
-CAD	= /octtools/release-3.0
-CADROOT	= ~octtools
-UTILS	= ${CAD}/utils
+#CAD	= /octtools/release-3.0
+CAD	= .
+#CADROOT	= ~octtools
+#UTILS	= ${CAD}/utils
+PORT_E	= port
+UTILITY_E = utility
 
 LINTCREATEFLAG = -C
 LINTEXTRAS =
 DBGFLAG =
 OPTFLAG =
+CDBG +=
 
 # an alternative if you want links in the installation locations
 # back to the source directories would be:
 #   CP = sh -c 'ln -s `pwd`/$$0 $$1'
 CP = cp
 
-BUILD = ${UTILS}/bin/create-octtools-makefile
+#BUILD = ${UTILS}/bin/create-octtools-makefile
 
 # cute hack for the sequent
 #   setenv PARALLEL 8; make P="&" install
@@ -112,8 +116,8 @@ DISTHOST= BOGUS-HOST
 MISC	= Makefile Makefile.template ex examples espresso.5 pla.5
 
 #LIBS	= $(CAD)/lib/libutility$(DBGFLAG).a $(CAD)/lib/libst$(DBGFLAG).a $(CAD)/lib/libmm$(DBGFLAG).a $(CAD)/lib/liberrtrap$(DBGFLAG).a $(CAD)/lib/libuprintf$(DBGFLAG).a $(CAD)/lib/libport$(DBGFLAG).a
-LIBS	= $(CAD)/lib/libutility$(DBGFLAG).a
-LINTLIBS= $(CAD)/lib/llib-lutility.ln
+LIBS	= $(CAD)/$(UTILITY_E)/libutility$(DBGFLAG).a
+#LINTLIBS= $(CAD)/lib/llib-lutility.ln
 
 TARGET	= ${NAME}
 TARGETG	= ${NAME}-g
@@ -145,8 +149,9 @@ MAKEVARS =	\
 		"UTILS=${UTILS}" \
 		"VPATH=${VPATH}"
 
-INCLUDE	=  -I$(CAD)/include
+INCLUDE	=  -I$(CAD)/include -I$(PORT_E) -I$(UTILITY_E)
 CFLAGS	= ${OPTFLAG} ${DBGFLAG} ${INCLUDE} '-DCADROOT="${CADROOT}"'
+CFLAGS	+= $(CDBG)
 VERSION	= "-DCUR_DATE=\"`date | awk '{print $$2, $$3, $$6}'`\"" \
 	  "-DCUR_TIME=\"`date | awk '{print $$4}'`\""
 LINTFLAGS= ${INCLUDE} '-DCADROOT="${CADROOT}"'${LINTEXTRAS}

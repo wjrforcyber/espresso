@@ -15,12 +15,21 @@
 
 #include "espresso.h"
 #include "main.h"		/* table definitions for options */
+#include "utility/utility.h"
 
 static FILE *last_fp;
 static int input_type = FD_type;
 
+void init_runtime();
+void backward_compatibility_hack(int *argc, char **argv, int *option, int *out_type);
+void usage();
+void getPLA(int opt, int argc, char *argv[], int option, pPLA *PLA, int out_type);
+void disassemble_fsm(pPLA PLA, int verbose_mode);
+void runtime();
+void delete_arg(int *argc, register char *argv[], int num);
+bool check_arg(int *argc, register char *argv[], register char *s);
 
-main(argc, argv)
+void main(argc, argv)
 int argc;
 char *argv[];
 {
@@ -518,13 +527,7 @@ char *argv[];
 }
 
 
-getPLA(opt, argc, argv, option, PLA, out_type)
-int opt;
-int argc;
-char *argv[];
-int option;
-pPLA *PLA;
-int out_type;
+void getPLA(int opt, int argc, char *argv[], int option, pPLA *PLA, int out_type)
 {
     FILE *fp;
     int needs_dcset, needs_offset;
@@ -562,7 +565,7 @@ int out_type;
 }
 
 
-runtime()
+void runtime()
 {
     int i;
     long total = 1, temp;
@@ -581,7 +584,7 @@ runtime()
 }
 
 
-init_runtime()
+void init_runtime()
 {
     total_name[READ_TIME] =     "READ       ";
     total_name[WRITE_TIME] =    "WRITE      ";
@@ -601,7 +604,7 @@ init_runtime()
 }
 
 
-subcommands()
+void subcommands()
 {
     int i, col;
     printf("                ");
@@ -620,7 +623,7 @@ subcommands()
 }
 
 
-usage()
+void usage()
 {
     printf("%s\n\n", VERSION);
     printf("SYNOPSIS: espresso [options] [file]\n\n");
@@ -653,11 +656,7 @@ usage()
  *  Hack for backward compatibility (ACK! )
  */
 
-backward_compatibility_hack(argc, argv, option, out_type)
-int *argc;
-char **argv;
-int *option;
-int *out_type;
+void backward_compatibility_hack(int *argc, char **argv, int *option, int *out_type)
 {
     int i, j;
 
@@ -718,9 +717,7 @@ int *out_type;
 
 
 /* delete_arg -- delete an argument from the argument list */
-delete_arg(argc, argv, num)
-int *argc, num;
-register char *argv[];
+void delete_arg(int *argc, register char *argv[], int num)
 {
     register int i;
     (*argc)--;
@@ -731,9 +728,7 @@ register char *argv[];
 
 
 /* check_arg -- scan argv for an argument, and return TRUE if found */
-bool check_arg(argc, argv, s)
-int *argc;
-register char *argv[], *s;
+bool check_arg(int *argc, register char *argv[], register char *s)
 {
     register int i;
     for(i = 1; i < *argc; i++) {

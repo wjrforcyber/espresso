@@ -9,6 +9,7 @@
  */
 #include "mincov_int.h"
 
+static int visit_col(sm_matrix *A, sm_col *pcol, int *rows_visited, int *cols_visited);
 
 static void
 copy_row(A, prow)
@@ -53,11 +54,7 @@ int *cols_visited;
 
 
 static int
-visit_col(A, pcol, rows_visited, cols_visited)
-sm_matrix *A;
-sm_col *pcol;
-int *rows_visited;
-int *cols_visited;
+visit_col(sm_matrix *A, sm_col *pcol, int *rows_visited, int *cols_visited)
 {
     sm_element *p;
     sm_row *prow;

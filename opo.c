@@ -59,7 +59,7 @@
 static int opo_no_make_sparse;
 static int opo_repeated;
 static int opo_exact;
-void minimize();
+static void minimize(pPLA PLA);
 
 void phase_assignment(PLA, opo_strategy)
 pPLA PLA;
@@ -411,9 +411,7 @@ int n;
  *  duplicated in the output part
  */
 
-output_phase_setup(PLA, first_output)
-INOUT pPLA PLA;
-int first_output;
+void output_phase_setup(INOUT pPLA PLA, int first_output)
 {
     pcover F, R, D;
     pcube mask, mask1, last;
@@ -613,8 +611,7 @@ int opo_strategy;
     PLA->R = best_R;
 }
 
-static void minimize(PLA)
-pPLA PLA;
+static void minimize(pPLA PLA)
 {
     if (opo_exact) {
 	EXEC_S(PLA->F = minimize_exact(PLA->F,PLA->D,PLA->R,1), "EXACT", PLA->F);

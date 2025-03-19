@@ -1,6 +1,6 @@
-CAD= /net/shambhala/users/octtools-3.0
+#CAD= /net/shambhala/users/octtools-3.0
 
-BINARY = ${CAD}/bin/espresso
+BINARY = ../espresso
 TARGETS = dc1.out mlp4.out Z5xp1.out bca.out cps.out opa.out ti.out tial.out
 
 all: ${TARGETS}

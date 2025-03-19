@@ -15,6 +15,17 @@
 #include "utility.h"
 #include "sparse.h"
 #include "mincov.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#define ALLOC(type, num)        \
+    ((type *) malloc(sizeof(type) * (num)))
+#define REALLOC(type, obj, num) \
+    (obj) ? ((type *) realloc((char *) obj, sizeof(type) * (num))) : \
+            ((type *) malloc(sizeof(type) * (num)))
+#define FREE(obj)               \
+    if ((obj)) { (void) free((char *) (obj)); (obj) = 0; }
+#define MAX(a,b)     ((a) > (b) ? (a) : (b))
 
 #define ptime()		util_cpu_time()
 #define print_time(t)	util_print_time(t)
@@ -543,10 +554,10 @@ extern struct cdata_struct cdata, temp_cdata_save;
 /* cubestr.c */	extern void restore_cube_struct();
 /* cubestr.c */	extern void save_cube_struct();
 /* cubestr.c */	extern void setdown_cube();
-/* cvrin.c */	extern PLA_labels();
+/* cvrin.c */	extern void PLA_labels(pPLA PLA);
 /* cvrin.c */	extern char *get_word();
 /* cvrin.c */	extern int label_index();
-/* cvrin.c */	extern int read_pla();
+/* cvrin.c */	extern int read_pla(IN FILE *fp, IN bool needs_dcset, IN bool needs_offset, IN int pla_type, OUT pPLA *PLA_return);
 /* cvrin.c */	extern int read_symbolic();
 /* cvrin.c */	extern pPLA new_PLA();
 /* cvrin.c */	extern void PLA_summary();
@@ -554,7 +565,7 @@ extern struct cdata_struct cdata, temp_cdata_save;
 /* cvrin.c */	extern void parse_pla();
 /* cvrin.c */	extern void read_cube();
 /* cvrin.c */	extern void skip_line();
-/* cvrm.c */	extern foreach_output_function();
+/* cvrm.c */	extern void foreach_output_function(pPLA PLA, int (*func)(), int (*func1)());
 /* cvrm.c */	extern int cubelist_partition();
 /* cvrm.c */	extern int so_both_do_espresso();
 /* cvrm.c */	extern int so_both_do_exact();
@@ -588,9 +599,9 @@ extern struct cdata_struct cdata, temp_cdata_save;
 /* cvrout.c */	extern char *pc2();
 /* cvrout.c */	extern char *pc3();
 /* cvrout.c */	extern int makeup_labels();
-/* cvrout.c */	extern kiss_output();
-/* cvrout.c */	extern kiss_print_cube();
-/* cvrout.c */	extern output_symbolic_constraints();
+/* cvrout.c */	extern void kiss_output(FILE *fp, pPLA PLA);
+/* cvrout.c */	extern void kiss_print_cube(FILE *fp, pPLA PLA, pcube p, char *out_string);
+/* cvrout.c */	extern void output_symbolic_constraints(FILE *fp, pPLA PLA, int output_symbolic);
 /* cvrout.c */	extern void cprint();
 /* cvrout.c */	extern void debug1_print();
 /* cvrout.c */	extern void debug_print();
@@ -603,7 +614,7 @@ extern struct cdata_struct cdata, temp_cdata_save;
 /* cvrout.c */	extern void print_cube();
 /* cvrout.c */	extern void print_expanded_cube();
 /* cvrout.c */	extern void sf_debug_print();
-/* equiv.c */	extern find_equiv_outputs();
+/* equiv.c */	extern void find_equiv_outputs(pPLA PLA);
 /* equiv.c */	extern int check_equiv();
 /* espresso.c */	extern pcover espresso();
 /* essen.c */	extern bool essen_cube();
@@ -630,14 +641,14 @@ extern struct cdata_struct cdata, temp_cdata_save;
 /* gasp.c */	extern pcover super_gasp();
 /* gasp.c */	extern void expand1_gasp();
 /* getopt.c */	extern int getopt();
-/* hack.c */	extern find_dc_inputs();
-/* hack.c */	extern find_inputs();
-/* hack.c */	extern form_bitvector();
-/* hack.c */	extern map_dcset();
-/* hack.c */	extern map_output_symbolic();
-/* hack.c */	extern map_symbolic();
+/* hack.c */	extern void find_dc_inputs();
+/* hack.c */	extern void find_inputs(pcover A, pPLA PLA, symbolic_list_t *list, int base, int value, pcover *newF, pcover *newD);
+/* hack.c */	extern void form_bitvector(pset p, int base, int value, symbolic_list_t *list);
+/* hack.c */	extern void map_dcset(pPLA PLA);
+/* hack.c */	extern void map_output_symbolic(pPLA PLA);
+/* hack.c */	extern void map_symbolic(pPLA PLA);
 /* hack.c */	extern pcover map_symbolic_cover();
-/* hack.c */	extern symbolic_hack_labels();
+/* hack.c */	extern void symbolic_hack_labels(pPLA PLA, symbolic_t *list, pset compress, int new_size, int old_size, int size_added);
 /* irred.c */	extern bool cube_is_covered();
 /* irred.c */	extern bool taut_special_cases();
 /* irred.c */	extern bool tautology();
@@ -648,7 +659,7 @@ extern struct cdata_struct cdata, temp_cdata_save;
 /* map.c */	extern pset minterms();
 /* map.c */	extern void explode();
 /* map.c */	extern void map();
-/* opo.c */	extern output_phase_setup();
+/* opo.c */	extern void output_phase_setup(INOUT pPLA PLA, int first_output);
 /* opo.c */	extern pPLA set_phase();
 /* opo.c */	extern pcover opo();
 /* opo.c */	extern pcube find_phase();
@@ -659,19 +670,19 @@ extern struct cdata_struct cdata, temp_cdata_save;
 /* opo.c */	extern void opoall();
 /* opo.c */	extern void phase_assignment();
 /* opo.c */	extern void repeated_phase_assignment();
-/* pair.c */	extern generate_all_pairs();
+/* pair.c */	extern void generate_all_pairs(ppair pair, int n, pset candidate, int (*action)());
 /* pair.c */	extern int **find_pairing_cost();
 /* pair.c */	extern int find_best_cost();
 /* pair.c */	extern int greedy_best_cost();
 /* pair.c */	extern int minimize_pair();
 /* pair.c */	extern int pair_free();
-/* pair.c */	extern pair_all();
+/* pair.c */	extern void pair_all(pPLA PLA, int pair_strategy);
 /* pair.c */	extern pcover delvar();
 /* pair.c */	extern pcover pairvar();
 /* pair.c */	extern ppair pair_best_cost();
 /* pair.c */	extern ppair pair_new();
 /* pair.c */	extern ppair pair_save();
-/* pair.c */	extern print_pair();
+/* pair.c */	extern void print_pair(ppair pair);
 /* pair.c */	extern void find_optimal_pairing();
 /* pair.c */	extern void set_pair();
 /* pair.c */	extern void set_pair1();
@@ -764,7 +775,7 @@ extern struct cdata_struct cdata, temp_cdata_save;
 #if !defined(__osf__) && !defined(__STDC__) && !defined(__hpux)
 /* ucbqsort.c */	extern qsort();
 #endif
-/* ucbqsort.c */	extern qst();
+///* ucbqsort.c */	extern qst();
 /* unate.c */	extern pcover find_all_minimal_covers_petrick();
 /* unate.c */	extern pcover map_cover_to_unate();
 /* unate.c */	extern pcover map_unate_to_cover();
@@ -773,7 +784,7 @@ extern struct cdata_struct cdata, temp_cdata_save;
 /* unate.c */	extern pset_family unate_compl();
 /* unate.c */	extern pset_family unate_complement();
 /* unate.c */	extern pset_family unate_intersect();
-/* verify.c */	extern PLA_permute();
+/* verify.c */	extern void PLA_permute(pPLA PLA1, pPLA PLA2);
 /* verify.c */	extern bool PLA_verify();
 /* verify.c */	extern bool check_consistency();
 /* verify.c */	extern bool verify();

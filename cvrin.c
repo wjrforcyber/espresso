@@ -13,6 +13,7 @@
 */
 
 #include "espresso.h"
+#include "utility.h"
 
 static bool line_length_error;
 static int lineno;
@@ -478,11 +479,7 @@ fatal("num_binary_vars (second field of .mv) cannot be negative");
 	> 0	 : Operation successful
 */
 
-int read_pla(fp, needs_dcset, needs_offset, pla_type, PLA_return)
-IN FILE *fp;
-IN bool needs_dcset, needs_offset;
-IN int pla_type;
-OUT pPLA *PLA_return;
+int read_pla(IN FILE *fp, IN bool needs_dcset, IN bool needs_offset, IN int pla_type, OUT pPLA *PLA_return)
 {
     pPLA PLA;
     int i, second, third;
@@ -650,8 +647,7 @@ pPLA new_PLA()
 }
 
 
-PLA_labels(PLA)
-pPLA PLA;
+void PLA_labels(pPLA PLA)
 {
     int i;
 
