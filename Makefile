@@ -67,7 +67,7 @@
 # for HPUX
 SHELL	= /bin/sh
 
-MAKE = /bin/make
+MAKE = /usr/bin/make
 
 #CAD	= /octtools/release-3.0
 CAD	= .
@@ -76,8 +76,8 @@ CAD	= .
 PORT_E	= port
 UTILITY_E = utility
 
-LINTCREATEFLAG = -C
-LINTEXTRAS =
+#LINTCREATEFLAG = -C
+#LINTEXTRAS =
 DBGFLAG =
 OPTFLAG =
 CDBG +=
@@ -100,6 +100,14 @@ REQUIRE	= utility
 
 # tools required for this tool
 TOOLREQUIRE = 
+
+SUBDIRS = $(CAD)/$(UTILITY_E)
+
+all: $(SUBDIRS)
+$(SUBDIRS):
+	$(MAKE) -C $@
+
+.PHONY: all $(SUBDIRS)
 
 SRC	= cofactor.c cols.c compl.c contain.c cubestr.c cvrin.c cvrm.c cvrmisc.c cvrout.c dominate.c equiv.c espresso.c essen.c exact.c expand.c gasp.c getopt.c gimpel.c globals.c hack.c indep.c irred.c main.c map.c matrix.c mincov.c opo.c pair.c part.c primes.c reduce.c rows.c set.c setc.c sharp.c sminterf.c solution.c sparse.c unate.c verify.c
 LSRC	= cofactor.c cols.c compl.c contain.c cubestr.c cvrin.c cvrm.c cvrmisc.c cvrout.c dominate.c equiv.c espresso.c essen.c exact.c expand.c gasp.c getopt.c gimpel.c globals.c hack.c indep.c irred.c main.c map.c matrix.c mincov.c opo.c pair.c part.c primes.c reduce.c rows.c set.c setc.c sharp.c sminterf.c solution.c sparse.c unate.c verify.c
@@ -161,7 +169,8 @@ LDFLAGS	=  -lm
 
 prog: ${TARGET}
 
-all: tags lint ${TARGET}
+#all: tags lint ${TARGET}
+all: ${TARGET}
 
 build: Makefile.template
 	${BUILD} Makefile.template
@@ -279,4 +288,6 @@ clean::
 clean::
 	(cd examples; make clean)
 
+clean::
+	(cd $(UTILITY_E); make clean)
 

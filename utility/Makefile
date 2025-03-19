@@ -171,7 +171,7 @@ LDFLAGS	= -lm
 
 
 #all: tags lint ${LIB} ${LINTLIB}
-all: tags ${LIB}
+all: ${LIB}
 
 build: Makefile.template
 	${BUILD} Makefile.template
